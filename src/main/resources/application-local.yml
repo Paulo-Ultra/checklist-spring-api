@@ -4,7 +4,7 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.H2Dialect
   datasource:
-    url: jdbc:h2:mem:testedb
+    url: jdbc:h2:mem:checklistdb
     driver-class-name: org.h2.Driver
     username: sa
     password: password
