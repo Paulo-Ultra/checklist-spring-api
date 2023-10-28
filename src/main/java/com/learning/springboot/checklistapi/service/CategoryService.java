@@ -20,6 +20,7 @@ public class CategoryService {
 
     private final ChecklistItemRepository checklistItemRepository;
     private final CategoryRepository categoryRepository;
+    private static final String CATEGORY_NOT_FOUND = "Category not found.";
 
     public CategoryService(CategoryRepository categoryRepository, ChecklistItemRepository checklistItemRepository) {
         this.categoryRepository = categoryRepository;
@@ -43,24 +44,24 @@ public class CategoryService {
             throw new IllegalArgumentException("Invalid parameters provided to update a category");
         }
         CategoryEntity retrivedCategory = this.categoryRepository.findByGuid(guid).orElseThrow(
-                () -> new ResourceNotFoundException("Category not found."));
+                () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND));
         retrivedCategory.setName(name);
-        log.debug("Updating category [ guid  {}, newName = {}", guid, name);
+        log.debug("Updating category [ guid = {}, newName = {}", guid, name);
 
         return this.categoryRepository.save(retrivedCategory);
     }
 
     public void deleteCategory(String guid){
-        if(StringUtils.hasText(guid)){
-            throw new IllegalArgumentException("Category guid cannot be empty or null");
-        }
+        this.validatingGuid(guid);
+
         CategoryEntity retrivedCategory = this.categoryRepository.findByGuid(guid).orElseThrow(
-                () -> new ResourceNotFoundException("Category not found."));
+                () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND));
 
         List<ChecklistItemEntity> checklistItems = this.checklistItemRepository.findByCategoryGuid(guid);
         if(!CollectionUtils.isEmpty(checklistItems)){
             throw new CategoryServiceException("It is not possible to delete given category as it has been used by checklist items");
         }
+        log.debug("Deleting category [guid = {} ]", guid);
         this.categoryRepository.delete(retrivedCategory);
     }
 
@@ -69,11 +70,14 @@ public class CategoryService {
     }
 
     public CategoryEntity findCategoryByGuid(String guid){
-        if(StringUtils.hasText(guid)){
+        this.validatingGuid(guid);
+        return this.categoryRepository.findByGuid(guid).orElseThrow(
+                () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND));
+    }
+
+    private void validatingGuid(String guid){
+        if(!StringUtils.hasText(guid)){
             throw new IllegalArgumentException("Category guid cannot be empty or null");
         }
-        log.debug("Deleting category [guid {} ]", guid);
-        return this.categoryRepository.findByGuid(guid).orElseThrow(
-                () -> new ResourceNotFoundException("Category not found."));
     }
 }
