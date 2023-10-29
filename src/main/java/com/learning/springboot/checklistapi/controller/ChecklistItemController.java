@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/checklist-items")
@@ -28,7 +27,7 @@ public class ChecklistItemController {
 
         List<ChecklistItemDTO> response =  this.checklistItemService.findAllChecklistItems()
                 .stream().map(ChecklistItemDTO::toDTO)
-                .collect(Collectors.toList());
+                .toList();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
