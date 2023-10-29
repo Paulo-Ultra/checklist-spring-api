@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -26,7 +25,7 @@ public class CategoryController {
 
         List<CategoryDTO> response = this.categoryService.findAllCategories().stream()
                 .map(CategoryDTO::toDTO)
-                .collect(Collectors.toList());
+                .toList();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

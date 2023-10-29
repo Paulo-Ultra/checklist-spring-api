@@ -2,7 +2,7 @@ package com.learning.springboot.checklistapi.service;
 
 import com.learning.springboot.checklistapi.entity.CategoryEntity;
 import com.learning.springboot.checklistapi.entity.ChecklistItemEntity;
-import com.learning.springboot.checklistapi.exception.CategoryServiceException;
+import com.learning.springboot.checklistapi.exception.ValidationException;
 import com.learning.springboot.checklistapi.exception.ResourceNotFoundException;
 import com.learning.springboot.checklistapi.repository.CategoryRepository;
 import com.learning.springboot.checklistapi.repository.ChecklistItemRepository;
@@ -59,7 +59,7 @@ public class CategoryService {
 
         List<ChecklistItemEntity> checklistItems = this.checklistItemRepository.findByCategoryGuid(guid);
         if(!CollectionUtils.isEmpty(checklistItems)){
-            throw new CategoryServiceException("It is not possible to delete given category as it has been used by checklist items");
+            throw new ValidationException("It is not possible to delete given category as it has been used by checklist items");
         }
         log.debug("Deleting category [guid = {} ]", guid);
         this.categoryRepository.delete(retrivedCategory);
