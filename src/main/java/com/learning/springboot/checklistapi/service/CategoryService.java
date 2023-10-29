@@ -2,8 +2,8 @@ package com.learning.springboot.checklistapi.service;
 
 import com.learning.springboot.checklistapi.entity.CategoryEntity;
 import com.learning.springboot.checklistapi.entity.ChecklistItemEntity;
-import com.learning.springboot.checklistapi.exception.ValidationException;
 import com.learning.springboot.checklistapi.exception.ResourceNotFoundException;
+import com.learning.springboot.checklistapi.exception.ValidationException;
 import com.learning.springboot.checklistapi.repository.CategoryRepository;
 import com.learning.springboot.checklistapi.repository.ChecklistItemRepository;
 import lombok.extern.slf4j.Slf4j;
