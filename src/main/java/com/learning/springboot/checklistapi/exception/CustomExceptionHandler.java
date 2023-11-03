@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -21,5 +22,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ExceptionalResponse(LocalDateTime.now(), ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY),
                 HttpStatus.UNPROCESSABLE_ENTITY);
 
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public final ResponseEntity<ExceptionalResponse> handleValidationException(ValidationException validationException){
+        log.error("An validation error happened to call API: {}", validationException);
+
+        return new ResponseEntity<>(new ExceptionalResponse(LocalDateTime.now(), validationException.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY),
+                HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

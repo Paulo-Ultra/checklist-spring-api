@@ -26,7 +26,7 @@ public class ChecklistApiApplication {
             public void addCorsMappings(CorsRegistry registry){
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:4200")
-                        .allowedMethods("GET", "PUT", "OPTIONS", "POST", "DELETE")
+                        .allowedMethods("GET", "PUT", "OPTIONS", "POST", "DELETE", "PATCH")
                         .maxAge(900) //Default = 1800(30 minutes)
                         .allowedHeaders("Origin", "X-Requested-With", "Content-Type","Accept", "Authorization");
             }
@@ -41,7 +41,7 @@ public class ChecklistApiApplication {
             public void addCorsMappings(CorsRegistry registry){
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:4200")
-                        .allowedMethods("GET", "PUT", "OPTIONS", "POST", "DELETE")
+                        .allowedMethods("GET", "PUT", "OPTIONS", "POST", "DELETE", "PATCH")
                         .maxAge(900) //Default = 1800(30 minutes)
                         .allowedHeaders("Origin", "X-Requested-With", "Content-Type","Accept", "Authorization");
             }

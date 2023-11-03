@@ -1,6 +1,8 @@
 package com.learning.springboot.checklistapi.controller;
 
 import com.learning.springboot.checklistapi.dto.ChecklistItemDTO;
+import com.learning.springboot.checklistapi.dto.NewResourceDTO;
+import com.learning.springboot.checklistapi.dto.UpdateStatusDTO;
 import com.learning.springboot.checklistapi.entity.ChecklistItemEntity;
 import com.learning.springboot.checklistapi.exception.ValidationException;
 import com.learning.springboot.checklistapi.service.ChecklistItemService;
@@ -29,6 +31,7 @@ public class ChecklistItemController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found all checklist items")
     })
+    @CrossOrigin
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ChecklistItemDTO>> getAllChecklistItems(){
 
@@ -39,26 +42,25 @@ public class ChecklistItemController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Operation(description = "Creates chesklist item")
+    @Operation(description = "Creates checklist item")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Checklist item created")
     })
+    @CrossOrigin
     @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createChecklistItems(@RequestBody ChecklistItemDTO checklistItemDTO){
-        if(checklistItemDTO.categoryDTO() == null){
-            throw new ValidationException("Category cannot be null");
-        }
+    public ResponseEntity<NewResourceDTO> createChecklistItems(@RequestBody ChecklistItemDTO checklistItemDTO){
         ChecklistItemEntity newChecklistItem = this.checklistItemService.addNewChecklistItem(
                  checklistItemDTO.description(), checklistItemDTO.isCompleted(),
                  checklistItemDTO.deadline(), checklistItemDTO.categoryDTO().guid());
 
-        return new ResponseEntity<>(newChecklistItem.getGuid(), HttpStatus.CREATED);
+        return new ResponseEntity<>(new NewResourceDTO(newChecklistItem.getGuid()), HttpStatus.CREATED);
     }
 
     @Operation(description = "Modify a chesklist item")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Checklist item modified")
     })
+    @CrossOrigin
     @PutMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateChecklistItems(@RequestBody ChecklistItemDTO checklistItemDTO){
         if(StringUtils.hasLength(checklistItemDTO.guid())){
@@ -75,10 +77,17 @@ public class ChecklistItemController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Checklist item deleted")
     })
+    @CrossOrigin
     @DeleteMapping(value = "{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteChecklistItem(@PathVariable String guid){
         this.checklistItemService.deleteChecklistItem(guid);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping(value = "{guid}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateCompletedStatus(@PathVariable String guid, @RequestBody UpdateStatusDTO statusDTO){
+        this.checklistItemService.updateIsCompletedStatus(guid, statusDTO.isCompleted());
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

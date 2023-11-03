@@ -1,6 +1,7 @@
 package com.learning.springboot.checklistapi.controller;
 
 import com.learning.springboot.checklistapi.dto.CategoryDTO;
+import com.learning.springboot.checklistapi.dto.NewResourceDTO;
 import com.learning.springboot.checklistapi.entity.CategoryEntity;
 import com.learning.springboot.checklistapi.exception.ValidationException;
 import com.learning.springboot.checklistapi.service.CategoryService;
@@ -19,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
 
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
     public CategoryController(CategoryService categoryService){
         this.categoryService = categoryService;
@@ -29,6 +30,7 @@ public class CategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found all categories")
     })
+    @CrossOrigin
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CategoryDTO>> getAllCategories(){
 
@@ -42,17 +44,19 @@ public class CategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Category created")
     })
+    @CrossOrigin
     @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> addNewCategory(@RequestBody CategoryDTO categoryDTO){
+    public ResponseEntity<NewResourceDTO> addNewCategory(@RequestBody CategoryDTO categoryDTO){
 
         CategoryEntity newCategory = this.categoryService.addNewCategory(categoryDTO.name());
-        return new ResponseEntity<>(newCategory.getGuid(), HttpStatus.CREATED);
+        return new ResponseEntity<>(new NewResourceDTO(newCategory.getGuid()), HttpStatus.CREATED);
     }
 
     @Operation(description = "Modify a category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Category modified")
     })
+    @CrossOrigin
     @PutMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateCategory(@RequestBody CategoryDTO categoryDTO){
         if(!StringUtils.hasText(categoryDTO.guid())){
@@ -67,6 +71,7 @@ public class CategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Category deleted")
     })
+    @CrossOrigin
     @DeleteMapping(value = "{guid}")
     public ResponseEntity<Void> deleteCategory(@PathVariable String guid){
         this.categoryService.deleteCategory(guid);

@@ -16,6 +16,7 @@ public record ChecklistItemDTO(
         Boolean isCompleted,
         @NotNull(message = "Deadline is mandatory")
         LocalDate deadline,
+        LocalDate postedDate,
         CategoryDTO categoryDTO) {
 
     public static ChecklistItemDTO toDTO(ChecklistItemEntity checklistItemEntity) {
@@ -24,10 +25,11 @@ public record ChecklistItemDTO(
                 .description(checklistItemEntity.getDescription())
                 .isCompleted(checklistItemEntity.getIsCompleted())
                 .deadline(checklistItemEntity.getDeadline())
+                .postedDate(checklistItemEntity.getPostedDate())
                 .categoryDTO(checklistItemEntity.getCategory() != null ?
                         CategoryDTO.builder()
                                 .guid(checklistItemEntity.getCategory().getGuid())
-                                .guid(checklistItemEntity.getCategory().getName())
+                                .name(checklistItemEntity.getCategory().getName())
                                 .build() : null)
                 .build();
     }

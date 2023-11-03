@@ -26,23 +26,25 @@ public class ChecklistItemService {
         this.categoryRepository = categoryRepository;
     }
 
-    public ChecklistItemEntity addNewChecklistItem(String description, Boolean isCompleted,
-                                                   LocalDate deadline, String guid){
-        this.validateChecklistItemData(description, isCompleted, deadline, guid);
+    public ChecklistItemEntity addNewChecklistItem(String description, Boolean isCompleted, LocalDate deadline, String categoryGuid){
 
-        CategoryEntity category = this.categoryRepository.findByGuid(guid)
+        this.validateChecklistItemData(description, isCompleted, deadline,categoryGuid);
+
+        CategoryEntity retrievedCategory = this.categoryRepository.findByGuid(categoryGuid)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
-        ChecklistItemEntity checklistItem = new ChecklistItemEntity();
-        checklistItem.setGuid(UUID.randomUUID().toString());
-        checklistItem.setDescription(description);
-        checklistItem.setDeadline(deadline);
-        checklistItem.setIsCompleted(isCompleted);
-        checklistItem.setPostedDate(LocalDate.now());
-        checklistItem.setCategory(category);
+        ChecklistItemEntity checklistItemEntity = new ChecklistItemEntity();
+        checklistItemEntity.setGuid(UUID.randomUUID().toString());
+        checklistItemEntity.setDescription(description);
+        checklistItemEntity.setDeadline(deadline);
+        checklistItemEntity.setPostedDate(LocalDate.now());
+        checklistItemEntity.setCategory(retrievedCategory);
+        checklistItemEntity.setIsCompleted(isCompleted);
 
-        log.debug("Adding new cheklist item [ checklistItem = {} ]", checklistItem);
-        return checklistItemRepository.save(checklistItem);
+        log.debug("Adding new checklist item [ checklistItem = {} ]", checklistItemEntity);
+
+        return checklistItemRepository.save(checklistItemEntity);
+
     }
 
     public List<ChecklistItemEntity> findAllChecklistItems(){
@@ -62,12 +64,9 @@ public class ChecklistItemService {
                                                    LocalDate deadline, String categoryGuid){
 
         this.validatingGuid(guid);
-        ChecklistItemEntity retrivedItem = this.checklistItemRepository.findByGuid(guid)
+        ChecklistItemEntity retrivedItem = this.checklistItemRepository.findByGuid(categoryGuid)
                 .orElseThrow(() -> new ResourceNotFoundException(CHECKLIST_ITEM_NOT_FOUND));
 
-        if(StringUtils.hasText(description)){
-            retrivedItem.setDescription(description);
-        }
         if(StringUtils.hasText(description)){
             retrivedItem.setDescription(description);
         }
@@ -82,7 +81,7 @@ public class ChecklistItemService {
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found."));
             retrivedItem.setCategory(retrivedCategory);
         }
-        log.debug("Updating checklist item [ checklisItem = {} ]", retrivedItem.toString());
+        log.debug("Updating checklist item [ checklistItem = {} ]", retrivedItem.toString());
 
         return this.checklistItemRepository.save(retrivedItem);
     }
@@ -93,9 +92,21 @@ public class ChecklistItemService {
                 () -> new ResourceNotFoundException(CHECKLIST_ITEM_NOT_FOUND));
     }
 
+    public void updateIsCompletedStatus(String guid, boolean isCompleted) {
+        validatingGuid(guid);
+        ChecklistItemEntity retrivedItem = this.checklistItemRepository.findByGuid(guid)
+                .orElseThrow(() -> new ResourceNotFoundException(CHECKLIST_ITEM_NOT_FOUND));
+
+        log.debug("Updating checklist item completed status [ guid = {}, isCompleted={} ]", guid, isCompleted);
+
+        retrivedItem.setIsCompleted(isCompleted);
+
+        this.checklistItemRepository.save(retrivedItem);
+    }
+
     private void validateChecklistItemData(String description, Boolean isCompleted,
                                       LocalDate deadline, String guid){
-        if(StringUtils.hasText(description)){
+        if(!StringUtils.hasText(description)){
             throw new IllegalArgumentException("Checklist item must have a description");
         }
         if(isCompleted == null){
@@ -104,10 +115,11 @@ public class ChecklistItemService {
         if(deadline == null){
             throw new IllegalArgumentException("Checklist item must have a deadline");
         }
-        if(StringUtils.hasText(guid)){
+        if(!StringUtils.hasText(guid)){
             throw new IllegalArgumentException("Checklist item category guid must be provided");
         }
     }
+
     private void validatingGuid(String guid){
         if(!StringUtils.hasText(guid)){
             throw new IllegalArgumentException("ChecklistItem guid cannot be empty or null");

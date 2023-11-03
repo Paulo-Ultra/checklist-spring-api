@@ -27,8 +27,8 @@ public class CategoryService {
         this.checklistItemRepository = checklistItemRepository;
     }
 
-    public CategoryEntity addNewCategory(String name){
-        if(!StringUtils.hasText(name)){
+    public CategoryEntity addNewCategory(String name) {
+        if (!StringUtils.hasText(name)) {
             throw new IllegalArgumentException("Category name cannot be empty or null");
         }
         CategoryEntity newCategory = new CategoryEntity();
@@ -40,29 +40,31 @@ public class CategoryService {
     }
 
     public CategoryEntity updateCategory(String guid, String name){
-        if(guid == null || StringUtils.hasText(name)){
+        if(!StringUtils.hasText(guid) || !StringUtils.hasText(name)){
             throw new IllegalArgumentException("Invalid parameters provided to update a category");
         }
-        CategoryEntity retrivedCategory = this.categoryRepository.findByGuid(guid).orElseThrow(
-                () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND));
-        retrivedCategory.setName(name);
+            CategoryEntity retrievedCategory = this.categoryRepository.findByGuid(guid).orElseThrow(
+                    () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND)
+            );
+        retrievedCategory.setName(name);
         log.debug("Updating category [ guid = {}, newName = {}", guid, name);
 
-        return this.categoryRepository.save(retrivedCategory);
+        return this.categoryRepository.save(retrievedCategory);
     }
 
     public void deleteCategory(String guid){
-        this.validatingGuid(guid);
+        validatingGuid(guid);
 
-        CategoryEntity retrivedCategory = this.categoryRepository.findByGuid(guid).orElseThrow(
-                () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND));
+        CategoryEntity retrievedCategory = this.categoryRepository.findByGuid(guid).orElseThrow(
+                () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND)
+        );
 
         List<ChecklistItemEntity> checklistItems = this.checklistItemRepository.findByCategoryGuid(guid);
         if(!CollectionUtils.isEmpty(checklistItems)){
             throw new ValidationException("It is not possible to delete given category as it has been used by checklist items");
         }
         log.debug("Deleting category [guid = {} ]", guid);
-        this.categoryRepository.delete(retrivedCategory);
+        this.categoryRepository.delete(retrievedCategory);
     }
 
     public List<CategoryEntity> findAllCategories(){
@@ -70,9 +72,10 @@ public class CategoryService {
     }
 
     public CategoryEntity findCategoryByGuid(String guid){
-        this.validatingGuid(guid);
+           validatingGuid(guid);
         return this.categoryRepository.findByGuid(guid).orElseThrow(
-                () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND));
+                () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND)
+        );
     }
 
     private void validatingGuid(String guid){
