@@ -1,5 +1,6 @@
 package com.learning.springboot.checklistapi.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.learning.springboot.checklistapi.entity.ChecklistItemEntity;
 import lombok.Builder;
 
@@ -17,6 +18,7 @@ public record ChecklistItemDTO(
         @NotNull(message = "Deadline is mandatory")
         LocalDate deadline,
         LocalDate postedDate,
+        @JsonProperty(value = "category")
         CategoryDTO categoryDTO) {
 
     public static ChecklistItemDTO toDTO(ChecklistItemEntity checklistItemEntity) {

@@ -63,7 +63,7 @@ public class ChecklistItemController {
     @CrossOrigin
     @PutMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateChecklistItems(@RequestBody ChecklistItemDTO checklistItemDTO){
-        if(StringUtils.hasLength(checklistItemDTO.guid())){
+        if(!StringUtils.hasLength(checklistItemDTO.guid())){
             throw new ValidationException("Checklist Item guid is mandatory");
         }
         this.checklistItemService.updateChecklistItem(checklistItemDTO.guid(), checklistItemDTO.description(),

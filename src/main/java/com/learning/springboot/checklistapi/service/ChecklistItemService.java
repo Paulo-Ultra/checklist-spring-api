@@ -64,7 +64,7 @@ public class ChecklistItemService {
                                                    LocalDate deadline, String categoryGuid){
 
         this.validatingGuid(guid);
-        ChecklistItemEntity retrivedItem = this.checklistItemRepository.findByGuid(categoryGuid)
+        ChecklistItemEntity retrivedItem = this.checklistItemRepository.findByGuid(guid)
                 .orElseThrow(() -> new ResourceNotFoundException(CHECKLIST_ITEM_NOT_FOUND));
 
         if(StringUtils.hasText(description)){
