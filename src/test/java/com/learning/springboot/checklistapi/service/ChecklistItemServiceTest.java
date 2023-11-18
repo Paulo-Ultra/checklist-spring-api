@@ -8,6 +8,7 @@ import com.learning.springboot.checklistapi.repository.ChecklistItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -18,7 +19,7 @@ import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
@@ -165,7 +166,6 @@ class ChecklistItemServiceTest {
 
         assertThat(exception.getMessage(), is("ChecklistItem guid cannot be empty or null"));
     }
-
     @Test
     void shouldUpdateAChecklistSuccessfully(){
 
@@ -193,6 +193,40 @@ class ChecklistItemServiceTest {
                         && checklistItemArg.getCategory().getGuid().equals(categoryGuid)));
     }
 
+    //Outra forma de pegar os parâmetros usando o verify com ArgumentCaptor
+    @Test
+    void shouldUpdateAChecklistSuccessfully2(){
+
+        //having
+        ChecklistItemEntity checklistItem = new ChecklistItemEntity();
+        String guid = UUID.randomUUID().toString();
+        checklistItem.setGuid(guid);
+        CategoryEntity savedCategory = new CategoryEntity();
+        String categoryGuid = UUID.randomUUID().toString();
+        savedCategory.setGuid(categoryGuid);
+        String description = "teste";
+        boolean isCompleted = true;
+        LocalDate deadline = LocalDate.now();
+
+        //when
+        when(checklistItemRepository.findByGuid(anyString())).thenReturn(Optional.of(checklistItem));
+        when(categoryRepository.findByGuid(anyString())).thenReturn(Optional.of(savedCategory));
+//        when(checklistItemRepository.save(any(ChecklistItemEntity.class))).thenReturn(new ChecklistItemEntity());
+
+        ArgumentCaptor<ChecklistItemEntity> argumentCaptor = ArgumentCaptor.forClass(ChecklistItemEntity.class);
+
+        //then
+        this.checklistItemService.updateChecklistItem(guid, description, isCompleted, deadline, categoryGuid);
+        verify(checklistItemRepository, times(1)).save(argumentCaptor.capture());
+        ChecklistItemEntity savedChecklistItem = argumentCaptor.getValue();
+        assertThat(savedChecklistItem.getGuid(), is(guid));
+        assertThat(savedChecklistItem.getDescription(), is(description));
+        assertThat(savedChecklistItem.getIsCompleted(), is(true));
+        assertThat(savedChecklistItem.getDeadline(), is(LocalDate.now()));
+        assertThat(savedChecklistItem.getCategory(), is(notNullValue()));
+        assertThat(savedChecklistItem.getCategory().getGuid(), is(categoryGuid));
+    }
+
     @Test
     void shouldThrowAnExceptionWhenUpdatingChecklistItemIsNotFound(){
         when(checklistItemRepository.findByGuid(anyString())).thenReturn(Optional.empty());
@@ -214,8 +248,8 @@ class ChecklistItemServiceTest {
 
         //when
         when(checklistItemRepository.findByGuid(anyString())).thenReturn(Optional.of(checklistItem));
-        when(categoryRepository.findByGuid(is(nullValue()).toString())).thenReturn(Optional.empty());
-        when(checklistItemRepository.save(any(ChecklistItemEntity.class))).thenReturn(new ChecklistItemEntity());
+        when(categoryRepository.findByGuid(anyString())).thenReturn(Optional.empty());
+        //when(checklistItemRepository.save(any(ChecklistItemEntity.class))).thenReturn(new ChecklistItemEntity());
 
         //then
         Exception exception = assertThrows(ResourceNotFoundException.class, () -> this.checklistItemService.updateChecklistItem(

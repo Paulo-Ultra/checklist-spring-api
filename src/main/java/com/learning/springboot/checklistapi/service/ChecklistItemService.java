@@ -76,11 +76,11 @@ public class ChecklistItemService {
         if(deadline != null){
             retrivedItem.setDeadline(deadline);
         }
-        if(!StringUtils.hasText(categoryGuid)){
-            CategoryEntity retrivedCategory = this.categoryRepository.findByGuid(categoryGuid)
-                    .orElseThrow(() -> new ResourceNotFoundException("Category not found."));
+
+        CategoryEntity retrivedCategory = this.categoryRepository.findByGuid(categoryGuid)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found."));
             retrivedItem.setCategory(retrivedCategory);
-        }
+
         log.debug("Updating checklist item [ checklistItem = {} ]", retrivedItem.toString());
 
         return this.checklistItemRepository.save(retrivedItem);
