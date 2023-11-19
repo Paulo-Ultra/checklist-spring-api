@@ -85,6 +85,7 @@ public class ChecklistItemController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @CrossOrigin
     @PatchMapping(value = "{guid}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateCompletedStatus(@PathVariable String guid, @RequestBody UpdateStatusDTO statusDTO){
         this.checklistItemService.updateIsCompletedStatus(guid, statusDTO.isCompleted());
